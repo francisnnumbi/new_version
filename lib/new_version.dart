@@ -121,13 +121,18 @@ class NewVersion {
       debugPrint('Can\'t find an app in the App Store with the id: $id');
       return null;
     }
+
     final jsonObj = json.decode(response.body);
-    return VersionStatus._(
-      localVersion: packageInfo.version,
-      storeVersion: jsonObj['results'][0]['version'],
-      appStoreLink: jsonObj['results'][0]['trackViewUrl'],
-      releaseNotes: jsonObj['results'][0]['releaseNotes'],
-    );
+    try {
+      return VersionStatus._(
+        localVersion: packageInfo.version,
+        storeVersion: jsonObj['results'][0]['version'],
+        appStoreLink: jsonObj['results'][0]['trackViewUrl'],
+        releaseNotes: jsonObj['results'][0]['releaseNotes'],
+      );
+    } catch (exc) {
+      return null;
+    }
   }
 
   /// Android info is fetched by parsing the html of the app store page.
@@ -158,12 +163,16 @@ class NewVersion {
         ?.querySelector('.DWPxHb')
         ?.text;
 
-    return VersionStatus._(
-      localVersion: packageInfo.version,
-      storeVersion: storeVersion,
-      appStoreLink: uri.toString(),
-      releaseNotes: releaseNotes,
-    );
+    try {
+      return VersionStatus._(
+        localVersion: packageInfo.version,
+        storeVersion: storeVersion,
+        appStoreLink: uri.toString(),
+        releaseNotes: releaseNotes,
+      );
+    } catch (exc) {
+      return null;
+    }
   }
 
   /// Shows the user a platform-specific alert about the app update. The user
